@@ -54,7 +54,7 @@ Then every application process that loads the SDK is restarted. Developers shoul
 
 What the subcommand does, in order:
 
-1. **Clears every `csi_*` index in OpenSearch** with `_delete_by_query` (`refresh=true`, `conflicts=proceed`). The target list is the union of `index_names::all_physical_indices()` and `_cat/indices/csi_*`, so indices outside `DEFAULT_DB_TABLES` (for example `csi_obo_chain_facts`) are included. Mappings created by `csi-init` stay in place. If any index cannot be cleared the command stops here, before touching the filesystem, and names the index; it is safe to run again.
+1. **Clears every `csi_*` index in OpenSearch** with `_delete_by_query` (`refresh=true`, `conflicts=proceed`). The target list is the union of Caber's known indices and every index matching `csi_*`, so indices outside the default table set (for example `csi_obo_chain_facts`) are included. Mappings created by `csi-init` stay in place. If any index cannot be cleared the command stops here, before touching the filesystem, and names the index; it is safe to run again.
 2. **Removes the derived tree under the GSS root** (`/shared/csi-mvp-master`): `QUARANTINE`, `COMMITTED`, `CANONICAL`, `ATAP`, and anything else there, **except `customer/`**, which holds the identity files and the governance package the deployment published. Those are configuration, not collected data, and are kept.
 3. **Removes `caber-core`'s working state under the local prefix**: `caber_core/epoch.sqlite`, `caber_core/stream_seq.sqlite`, `sdk_registry.sqlite`, `intersector/`, `staging/`, `doc_parser_work/`, `combine_shadow/`, `raw_s3_logs/`, `cqf_gss_cache/`, `pull/`, and `decision_parity_perf.jsonl`. The API key stores (`caber_core/api_keys.sqlite`, `hub_api_keys.sqlite`) are kept so the key the developer's applications use keeps working.
 
@@ -62,7 +62,7 @@ What it leaves alone: the object store and the documents in it, PostgreSQL, Neo4
 
 `docker compose exec` is required, not `docker compose run`: `run` starts a new container with its own empty `/var/tmp`, so it would clear the wrong working directory.
 
-In the public reference `docker-compose.yaml` every piece of Caber state (OpenSearch data, `caber-core` `/var/tmp`, `/shared`, VersityGW data, PostgreSQL data, relay spool) is on a compose-managed named volume, so `docker compose down -v` followed by `docker compose up -d` is also a complete reset. It removes more than the subcommand does: the buckets and their contents, the PostgreSQL databases, and any identity or governance configuration published inside the preview. A compose file that bind-mounts a host directory into `caber-core` (as CaberDemos does for `/shared`) must delete that directory by hand, which is what `demo.py down` does.
+In the reference `docker-compose.yaml` shipped in the `Caber-Systems/examples` repository every piece of Caber state (OpenSearch data, `caber-core` `/var/tmp`, `/shared`, VersityGW data, PostgreSQL data, relay spool) is on a compose-managed named volume, so `docker compose down -v` followed by `docker compose up -d` is also a complete reset. It removes more than the subcommand does: the buckets and their contents, the PostgreSQL databases, and any identity or governance configuration published inside the preview. A compose file that bind-mounts a host directory into `caber-core` (as CaberDemos does for `/shared`) must delete that directory by hand, which is what `demo.py down` does.
 
 ### What does not reset the counters
 
