@@ -2,7 +2,7 @@
 
 ## 1. Community Preview Edition Capabilities and Hard Limits
 
-The Community Preview Edition provides the full Caber runtime governance, OBO identity propagation, document scanning and indexing, and `CaberUserConsole` observability experience for non-commercial evaluation and local development, subject to three hard-coded capacity limits (`PREVIEW_LIMITS` in PyCaber `crates/sys_config/src/limits.rs`):
+The Community Preview Edition provides the full Caber runtime governance, OBO identity propagation, document scanning and indexing, and `CaberUserConsole` observability experience for non-commercial evaluation and local development, subject to three hard-coded capacity limits (hard-coded in `caber-core`):
 
 | Dimension | Preview Limit | Approaching Warning (80%) | Enforcement Behavior When Reached (100%) |
 | :--- | :--- | :--- | :--- |
@@ -30,7 +30,7 @@ The Community Preview Edition provides the full Caber runtime governance, OBO id
   - Turns **red** (`"reached"`) and displays reset instructions when any dimension hits 100 percent.
 - **Admin Home Attention Strip**: Surfaces warning and danger attention items for `events`, `objects`, and `sdk_instances` linking directly to `/admin/platform`.
 - **CLI Prerequisite Check**: Run `./demo.py check <demo>` to query `/v1/status` and inspect current preview limit state from the terminal.
-- **Where the reset text comes from**: the `reset_instructions` string in the `limits` block of `/v1/status` is `PREVIEW_LIMITS.reset_instructions` in PyCaber `crates/sys_config/src/limits.rs`. It names both procedures below. The console and `demo.py check` print it verbatim.
+- **Where the reset text comes from**: the `reset_instructions` string in the `limits` block of `/v1/status` is fixed in `caber-core`. It names both procedures below. The console and `demo.py check` print it verbatim.
 
 ### Resetting a CaberDemos demo
 
@@ -43,7 +43,7 @@ The Community Preview Edition provides the full Caber runtime governance, OBO id
 
 ### Resetting a stack composed without `demo.py`
 
-A developer who runs Caber from their own compose file has no `demo.py down`. `caber-core` therefore carries a `reset` subcommand (PyCaber `crates/caber_core/src/reset.rs`), run inside the live container, followed by a restart:
+A developer who runs Caber from their own compose file has no `demo.py down`. `caber-core` therefore carries a `reset` subcommand, run inside the live container, followed by a restart:
 
 ```bash
 docker compose exec caber-core caber-core reset
@@ -55,8 +55,8 @@ Then every application process that loads the SDK is restarted. Developers shoul
 What the subcommand does, in order:
 
 1. **Clears every `csi_*` index in OpenSearch** with `_delete_by_query` (`refresh=true`, `conflicts=proceed`). The target list is the union of `index_names::all_physical_indices()` and `_cat/indices/csi_*`, so indices outside `DEFAULT_DB_TABLES` (for example `csi_obo_chain_facts`) are included. Mappings created by `csi-init` stay in place. If any index cannot be cleared the command stops here, before touching the filesystem, and names the index; it is safe to run again.
-2. **Removes the derived tree under the GSS root** (`ResolvedTarget::volume_fs_root()`, `/shared/csi-mvp-master`): `QUARANTINE`, `COMMITTED`, `CANONICAL`, `ATAP`, and anything else there, **except `customer/`**, which holds the identity files and the governance package the deployment published. Those are configuration, not collected data, and are kept.
-3. **Removes `caber-core`'s working state under the local prefix** (`resolve_local_prefix(GLOBAL.localPrefix)`): `caber_core/epoch.sqlite`, `caber_core/stream_seq.sqlite`, `sdk_registry.sqlite`, `intersector/`, `staging/`, `doc_parser_work/`, `combine_shadow/`, `raw_s3_logs/`, `cqf_gss_cache/`, `pull/`, and `decision_parity_perf.jsonl`. The API key stores (`caber_core/api_keys.sqlite`, `hub_api_keys.sqlite`) are kept so the key the developer's applications use keeps working.
+2. **Removes the derived tree under the GSS root** (`/shared/csi-mvp-master`): `QUARANTINE`, `COMMITTED`, `CANONICAL`, `ATAP`, and anything else there, **except `customer/`**, which holds the identity files and the governance package the deployment published. Those are configuration, not collected data, and are kept.
+3. **Removes `caber-core`'s working state under the local prefix**: `caber_core/epoch.sqlite`, `caber_core/stream_seq.sqlite`, `sdk_registry.sqlite`, `intersector/`, `staging/`, `doc_parser_work/`, `combine_shadow/`, `raw_s3_logs/`, `cqf_gss_cache/`, `pull/`, and `decision_parity_perf.jsonl`. The API key stores (`caber_core/api_keys.sqlite`, `hub_api_keys.sqlite`) are kept so the key the developer's applications use keeps working.
 
 What it leaves alone: the object store and the documents in it, PostgreSQL, Neo4j if one is running, and the webhook relay spool. Documents still in the customer buckets count again when the fresh deployment scans them.
 
@@ -84,8 +84,8 @@ The Caber Community Preview Edition is proprietary software protected by United 
    - No cloning: building or training a substitute from the software or its outputs.
    - Keep the copyright and license notices intact.
    - Benchmarks and write-ups are permitted. Caber asks for a heads-up before numbers are published so the configuration can be checked, and does not require consent.
-2. **DMCA 17 U.S.C. § 1201 Technological Protection Measures (`secure_connect`)**:
-   - `caber-core` (`/v1/sdk/register` and `/v1/sdk/heartbeat`) issues time-bound, HMAC-SHA256 cryptographically signed capability tokens via `crates/secure_connect` (`create_secure_token` / `verify_secure_token` and `tamper_resistant::LicenseInfo`).
+2. **DMCA 17 U.S.C. § 1201 Technological Protection Measures**:
+   - `caber-core` (`/v1/sdk/register` and `/v1/sdk/heartbeat`) issues time-bound, HMAC-SHA256 cryptographically signed capability tokens.
    - The native `pycaber_wrap` (`streaming_core`) extension verifies these tokens in compiled Rust code before permitting request/response interception or OBO governance execution. Missing, expired, or tampered tokens (for example, proxying heartbeat responses to alter `"state": "reached"`) immediately latch `PREVIEW_SUSPENDED = true`.
    - The limit counters and the write freeze (section 1) are also technological protection measures. Circumventing them, as opposed to running the documented resets, is a § 1201 matter as well as a license breach.
 3. **Binary and Asset Hardening**:
