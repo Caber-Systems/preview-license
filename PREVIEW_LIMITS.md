@@ -74,15 +74,15 @@ In the reference `docker-compose.yaml` shipped in the `Caber-Systems/examples` r
 
 ## 3. Copyright, Trade Secret, and DMCA § 1201 Technological Protection Measures
 
-The Caber Community Preview Edition is proprietary software protected by United States and international copyright laws, trade secret laws, and the Digital Millennium Copyright Act (**17 U.S.C. § 1201**). The license is a no-assent copyright license: its conditions bind whoever uses the software, and breach of a condition ends the license without any cure period. The notice text is [LICENSE-PREVIEW.md](https://github.com/Caber-Systems/preview-license/blob/v1.1/LICENSE-PREVIEW.md); this section summarises the terms that the code and the docs rely on.
+The Caber Community Preview Edition is proprietary software protected by United States and international copyright laws, trade secret laws, and the Digital Millennium Copyright Act (**17 U.S.C. § 1201**). The license is a no-assent copyright license: its conditions bind whoever uses the software, and breach of a condition ends the license without any cure period. The license text is [LICENSE-PREVIEW.md](https://github.com/Caber-Systems/preview-license/blob/v1.2/LICENSE-PREVIEW.md); this section summarises the terms that the code and the docs rely on.
 
 1. **Evaluation-Only License Grant**:
-   - Licensed for evaluation, development, testing, and demonstration. No production use and no commercial use (paid or not, internal or not).
-   - No redistribution of the software or its images, wheels, or binaries.
+   - Licensed for evaluation, development, testing, and demonstration. No production infrastructure, no connection to production systems, no production data (including copies of it), and no commercial use (paid or not, internal or not).
+   - No redistribution of the software or its images, wheels, or binaries. Sharing Caber's official download link is fine.
    - No tampering with the limits or the mechanisms that enforce them. The reset procedures documented in section 2 are the supported way to start over and are expressly not tampering.
-   - No reverse engineering, decompilation, disassembly, or extraction of embedded scripts, models, or ontologies, **whether by hand or by AI**: feeding the software, its binaries, its outputs, or its telemetry to a model or agent to reconstruct, approximate, or train a substitute is prohibited. Using an AI assistant to write an application that uses the Caber SDK is fine.
-   - No cloning: building or training a substitute from the software or its outputs.
-   - Keep the copyright and license notices intact.
+   - No reverse engineering, decompilation, disassembly, or extraction of embedded scripts, models, or ontologies, **whether by hand or by AI**: submitting the software's binaries, compiled extensions, embedded assets, disassembly, memory dumps, or SDK protocol and token captures to a model or agent to analyze, reconstruct, reimplement, or describe its internals is prohibited. Using an AI assistant to write or debug an application that uses the documented Caber SDK and APIs, including sharing Preview error messages, is fine.
+   - No replication: no training or fine-tuning a model on the software or its embedded assets, and no using the software, its assets, or its outputs to build a product or train a model that replicates Caber's core runtime interception, governance, or provenance capabilities as a replacement for Caber. Outputs generated from your own data may be used to train models for other purposes, provided they contain no Caber embedded assets or proprietary internal materials.
+   - Keep this license and the copyright notices intact.
    - Benchmarks and write-ups are permitted. Caber asks for a heads-up before numbers are published so the configuration can be checked, and does not require consent.
 2. **DMCA 17 U.S.C. § 1201 Technological Protection Measures**:
    - `caber-core` (`/v1/sdk/register` and `/v1/sdk/heartbeat`) issues time-bound, HMAC-SHA256 cryptographically signed capability tokens.
@@ -91,6 +91,9 @@ The Caber Community Preview Edition is proprietary software protected by United 
 3. **Binary and Asset Hardening**:
    - All 27 Python document-runner scripts and ontology assets are compiled into the `caber-core` binary (`embed-python-scripts`), verified with `xxh3_64` integrity digests, and isolated from runtime directory overrides.
    - Release wheels and binaries are built with Cython native compilation (`PYCABER_COMPILE_PY=1`), LTO, and stripped symbols.
-   - The preview is **not security hardened** for production exposure. The notice says so and carries no invitation to security research; the no-warranty section covers it.
+   - The preview is **not security hardened** for production exposure, and the license says so.
+4. **Security Testing**:
+   - The license (section 4) authorizes good-faith vulnerability scanning of your own isolated, non-production Preview deployment and testing through documented interfaces within it. The authorization does not cover Caber-operated systems, other deployments, bypassing Preview controls, or extracting proprietary internals, and the authorization ends when the license does.
+   - Suspected vulnerabilities can be reported privately to support@caber.com with the Preview build and reproduction details, and without customer data, credentials, or other confidential material. Caber has no obligation to respond to or remediate a report.
 
 Upgrade information: <https://caber.com/upgrade>.
