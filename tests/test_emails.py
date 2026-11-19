@@ -10,7 +10,7 @@ from pathlib import Path
 import re
 
 ROOT = Path(__file__).resolve().parents[1]
-PUBLISHED = (ROOT / "LICENSE-PREVIEW.md", ROOT / "PREVIEW_LIMITS.md", ROOT / "README.md")
+PUBLISHED = (ROOT / "LICENSE-PREVIEW.md", ROOT / "LICENSE.md", ROOT / "PREVIEW_LIMITS.md", ROOT / "README.md")
 EMAIL_RE = re.compile(r"(?<![A-Za-z0-9._%+-])[A-Za-z0-9._%+-]+@(?:caber\.com|axotl\.ai)\b", re.IGNORECASE)
 
 MANUALLY_TESTED = {"support@caber.com"}
